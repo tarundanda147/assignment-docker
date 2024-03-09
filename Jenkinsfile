@@ -20,11 +20,23 @@ pipeline {
             }
         }
 
+        stage('Terraform Init') {
+            steps {
+                dir('assignment-docker/terraform') {  // Change directory to 'terraform' directory within 'assignment-docker'
+                    script {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
         stage('Terraform Plan') {
             steps {
-                script {
-                    sh "terraform plan -input=false -out=tfplan"
-                    sh 'terraform show -no-color tfplan > tfplan.txt'
+                dir('assignment-docker/terraform') {  // Change directory to 'terraform' directory within 'assignment-docker'
+                    script {
+                        sh "terraform plan -input=false -out=tfplan"
+                        sh 'terraform show -no-color tfplan > tfplan.txt'
+                    }
                 }
             }
         }
@@ -44,7 +56,9 @@ pipeline {
 
         stage('Terraform Apply') {
             steps {
-                sh "terraform apply -input=false tfplan"
+                dir('assignment-docker/terraform') {  // Change directory to 'terraform' directory within 'assignment-docker'
+                    sh "terraform apply -input=false tfplan"
+                }
             }
         }
     }
