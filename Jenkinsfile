@@ -4,6 +4,7 @@ pipeline {
     parameters {
         string(name: 'environment', defaultValue: 'terraform', description: 'Workspace/environment file to use for deployment')
         booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
+        booleanParam(name: 'destroy', defaultValue: false, description: 'Destroy infrastructure instead of applying changes?')
     }
 
     environment {
@@ -22,7 +23,7 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                dir('assignment-docker/terraform') {  // Change directory to 'terraform' directory within 'assignment-docker'
+                dir('assignment-docker/terraform') {
                     script {
                         sh 'terraform init'
                     }
@@ -32,7 +33,7 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                dir('assignment-docker/terraform') {  // Change directory to 'terraform' directory within 'assignment-docker'
+                dir('assignment-docker/terraform') {
                     script {
                         sh "terraform plan -input=false -out=tfplan"
                         sh 'terraform show -no-color tfplan > tfplan.txt'
@@ -44,28 +45,26 @@ pipeline {
         stage('Approval') {
             when {
                 not { equals expected: true, actual: params.autoApprove }
+                not { equals expected: true, actual: params.destroy }
             }
             steps {
                 script {
-                    def plan = readFile 'tfplan.txt'
+                    def plan = readFile 'assignment-docker/terraform/tfplan.txt'
                     input message: "Do you want to apply the plan?",
-                    parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                          parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
                 }
             }
         }
-
-        stage('Terraform Apply') {
+        
+        stage('Apply') {
+            when {
+                not { equals expected: true, actual: params.destroy }
+            }
             steps {
-                dir('assignment-docker/terraform') {  // Change directory to 'terraform' directory within 'assignment-docker'
-                    sh "terraform apply -input=false tfplan"
+                dir('assignment-docker/terraform') {
+                    sh 'terraform apply -input=false tfplan'
                 }
             }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
         }
     }
 }
