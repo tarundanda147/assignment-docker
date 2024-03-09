@@ -68,13 +68,18 @@ resource "aws_instance" "test_first" {
   vpc_security_group_ids = [aws_security_group.all_traffic.id]
   subnet_id     = aws_subnet.example_subnet.id
   associate_public_ip_address = true  # Enable auto-assignment of public IP
-  user_data = "${data.template_file.web-userdata.rendered}"
+  user_data = <<-EOF
+              ${data.template_file.web-userdata.rendered}
+              git clone https://github.com/tarundanda147/scripts.git
+              # Additional commands if needed
+              EOF
   tags = {
     Name     = "HelloWorld"
     Stage    = "testing"
     Location = "India"
   }
 }
+
 data "template_file" "web-userdata" {
         template = "${file("dockerinstall.sh")}"
 }
