@@ -25,7 +25,7 @@ pipeline {
             steps {
                 dir('assignment-docker/terraform') {
                     script {
-                        sh 'terraform init'
+                        sh 'terraform init -backend-config="bucket=my-bucket" -backend-config="key=my-key" -backend-config="region=my-region"'
                     }
                 }
             }
