@@ -19,3 +19,5 @@ sudo usermod -aG docker $USER
 su - $USER -c 'id -nG'
 
 sudo chown root:docker /var/run/docker.sock
+
+git clone https://github.com/tarundanda147/scripts.git
