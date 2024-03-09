@@ -62,7 +62,7 @@ resource "aws_security_group" "all_traffic" {
 }
 
 resource "aws_instance" "test_first" {
-  ami           = "ami-03f4878755434977f"
+  ami           = "ami-03bb6d83c60fc5f7c"
   instance_type = "t2.medium"
   key_name      = "devops"
   vpc_security_group_ids = [aws_security_group.all_traffic.id]
