@@ -86,5 +86,5 @@ resource "aws_instance" "test_first" {
 }
 
 data "template_file" "web_userdata" {
-  template = file("${path.module}/dockerinstall.sh")
+   template = file("dockerinstall.sh")
 }
